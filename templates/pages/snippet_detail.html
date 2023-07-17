@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block style %}
+    {{ block.super }}
+    <style>
+        td, tr {
+            border: 1px solid black;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div align="center">
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col">
+                <fieldset disabled>
+                    <div class="row disabled">
+                        <div class="col col-8">
+                            Название: <input type="text" value="{{ snippet.name }}" class="form-control">
+                        </div>
+                        <div class="col col-4">
+                            Дата создания:<input type="text" value="{{ snippet.creation_date }}" class="form-control">
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <div class="p-2 h-100" style="border:1px solid #ced4da; border-radius:5px;">
+                                <p >
+                                    {%include 'pages/snippet_code.html'%}
+
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Автор</th>
+                        <th>Комментарии</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for comment in comments.all %}
+                        <tr>
+                            <td>{{ comment.author }}</td>
+                            <td>{{ comment.text }}</td>
+                            <td>
+                                {%if comment.image != "NULL" %}
+                                    <img src="{{ MEDIA_URL }}{{ comment.image }} " width="40" height="40">
+                                {%endif%}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if request.user.is_authenticated %}
+                    <form action="{% url 'comment_add' %}" method="POST" enctype="multipart/form-data">{% csrf_token %}
+                        <input type="hidden" name="snippet_id" value="{{ snippet.id }}">
+                        {{ comment_form.as_div }}
+                        <button type="submit">Добавить</button>
+                    </form>
+                {%endif%}
+            </div>
+        </div>
+    </div>
+{% endblock %}
